@@ -85,6 +85,13 @@ LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS}"
 EOF
 fi
 
+case "${SKETCH}" in
+    https://*|http://*|git@*|git://|git+ssh://)
+        git clone -q "${SKETCH}" "${CFGDIR}/sketch"
+        SKETCH="${CFGDIR}/sketch"
+        ;;
+esac
+
 docker run -ti                           \
        -v "${SKETCH}:/src/firmware/src"    \
        -v "${OUTPUT}:/src/firmware/output" \
