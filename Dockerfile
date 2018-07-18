@@ -39,6 +39,7 @@ RUN git clone https://github.com/keyboardio/Arduino-Boards.git hardware/keyboard
 ENV BOARD_HARDWARE_PATH /src/firmware/hardware
 
 VOLUME /src/firmware/src
+VOLUME /src/firmware/config
 VOLUME /src/firmware/output
 
 COPY files/entrypoint.sh /opt

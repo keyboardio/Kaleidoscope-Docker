@@ -30,7 +30,11 @@ Usage: $0 [options] [builder-parameters...]
 Options:
   -s SKETCH_DIR     -- Use SKETCH_DIR as the sketch source. Defaults to '.'.
   -o OUTPUT_DIR     -- Put build artifacts into OUTPUT_DIR. Defaults to './output'.
+  -O OPTION         -- Additional builder options (see below).
   -h                -- This help screen.
+
+Builder options (-O):
+  plugin-v2         -- Build with the V1 plugin API disabled.
 EOF
 }
 
@@ -43,14 +47,18 @@ fi
 
 SKETCH="$(pwd)"
 OUTPUT="$(pwd)/output"
+OPTIONS=""
 
-while getopts ":s:oh" o; do
+while getopts ":s:o:O:h" o; do
     case "${o}" in
         s)
             SKETCH="${OPTARG}"
             ;;
         o)
             OUTPUT="${OPTARG}"
+            ;;
+        O)
+            OPTIONS="${OPTIONS} ${OPTARG}"
             ;;
         'h')
             usage
@@ -60,9 +68,29 @@ while getopts ":s:oh" o; do
 done
 shift $(expr $OPTIND - 1)
 
+KALEIDOSCOPE_LOCAL_CFLAGS=""
+for opt in ${OPTIONS}; do
+    case $opt in
+        plugin-v2)
+            KALEIDOSCOPE_LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS} -DKALEIDOSCOPE_ENABLE_V1_PLUGIN_API=0"
+            ;;
+    esac
+done
+
+CFGDIR=$(mktemp -d)
+
+if [ ! -z "${KALEIDOSCOPE_LOCAL_CFLAGS}" ]; then
+    cat >>${CFGDIR}/kaleidoscope-builder.conf <<EOF
+LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS}"
+EOF
+fi
+
 docker run -ti                           \
        -v ${SKETCH}:/src/firmware/src    \
        -v ${OUTPUT}:/src/firmware/output \
+       -v ${CFGDIR}:/src/firmware/config \
        local/kaleidoscope-builder $@
+
+rm -rf "${CFGDIR}"
 
 ls -la ${OUTPUT}/*.hex
