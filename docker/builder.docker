@@ -42,6 +42,6 @@ VOLUME /src/firmware/src
 VOLUME /src/firmware/config
 VOLUME /src/firmware/output
 
-COPY files/entrypoint.sh /opt
+COPY docker/files/entrypoint.sh /opt
 
 ENTRYPOINT ["/opt/entrypoint.sh"]
