@@ -60,13 +60,13 @@ while getopts ":s:o:O:h" o; do
         O)
             OPTIONS="${OPTIONS} ${OPTARG}"
             ;;
-        'h')
+        h)
             usage
             exit 0
             ;;
     esac
 done
-shift $(expr $OPTIND - 1)
+shift $((OPTIND - 1))
 
 KALEIDOSCOPE_LOCAL_CFLAGS=""
 for opt in ${OPTIONS}; do
@@ -80,17 +80,17 @@ done
 CFGDIR=$(mktemp -d)
 
 if [ ! -z "${KALEIDOSCOPE_LOCAL_CFLAGS}" ]; then
-    cat >>${CFGDIR}/kaleidoscope-builder.conf <<EOF
+    cat >>"${CFGDIR}/kaleidoscope-builder.conf" <<EOF
 LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS}"
 EOF
 fi
 
 docker run -ti                           \
-       -v ${SKETCH}:/src/firmware/src    \
-       -v ${OUTPUT}:/src/firmware/output \
-       -v ${CFGDIR}:/src/firmware/config \
-       local/kaleidoscope-builder $@
+       -v "${SKETCH}:/src/firmware/src"    \
+       -v "${OUTPUT}:/src/firmware/output" \
+       -v "${CFGDIR}:/src/firmware/config" \
+       local/kaleidoscope-builder "$@"
 
 rm -rf "${CFGDIR}"
 
-ls -la ${OUTPUT}/*.hex
+ls -la "${OUTPUT}"/*.hex
