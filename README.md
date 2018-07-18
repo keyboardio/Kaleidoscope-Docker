@@ -7,4 +7,4 @@ Eventually, this repository will provide tools for flashing too.
 
 ## Usage
 
-Run `./builder -s /path/to/your/sketch/`, and wait. Output will - by default - appear in an `output/` directory.
+Run `bin/builder -s /path/to/your/sketch/`, and wait. Output will - by default - appear in an `output/` directory.

@@ -39,7 +39,7 @@ Builder options (-O):
 EOF
 }
 
-docker build --quiet --rm -t local/kaleidoscope-builder . >/dev/null
+docker build --quiet --rm -t local/kaleidoscope-builder -f docker/builder.docker . >/dev/null
 
 if [ $# -lt 1 ]; then
     usage >&2
