@@ -31,6 +31,7 @@ Options:
   -s SKETCH_DIR     -- Use SKETCH_DIR as the sketch source. Defaults to '.'.
   -o OUTPUT_DIR     -- Put build artifacts into OUTPUT_DIR. Defaults to './output'.
   -O OPTION         -- Additional builder options (see below).
+  -p URL            -- Clone and make available an additional plugin.
   -h                -- This help screen.
 
 Builder options (-O):
@@ -48,8 +49,11 @@ fi
 SKETCH="$(pwd)"
 OUTPUT="$(pwd)/output"
 OPTIONS=""
+PLUGINS=""
+CFGDIR="$(mktemp -d)"
+LIBDIR="$(mktemp -d)"
 
-while getopts ":s:o:O:h" o; do
+while getopts ":s:o:O:p:h" o; do
     case "${o}" in
         s)
             SKETCH="${OPTARG}"
@@ -59,6 +63,9 @@ while getopts ":s:o:O:h" o; do
             ;;
         O)
             OPTIONS="${OPTIONS} ${OPTARG}"
+            ;;
+        p)
+            PLUGINS="${PLUGINS} ${OPTARG}"
             ;;
         h)
             usage
@@ -77,11 +84,20 @@ for opt in ${OPTIONS}; do
     esac
 done
 
-CFGDIR=$(mktemp -d)
+if [ ! -z "${PLUGINS}" ]; then
+    KALEIDOSCOPE_EXTRA_BUILDER_ARGS="-libraries /src/firmware/lib"
+    cwd="$(pwd)"
+    cd "${LIBDIR}"
+    for plugin in ${PLUGINS}; do
+        git clone -q "${plugin}"
+    done
+    cd "${cwd}"
+fi
 
 if [ ! -z "${KALEIDOSCOPE_LOCAL_CFLAGS}" ]; then
     cat >>"${CFGDIR}/kaleidoscope-builder.conf" <<EOF
 LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS}"
+EXTRA_BUILDER_ARGS="${KALEIDOSCOPE_EXTRA_BUILDER_ARGS}"
 EOF
 fi
 
@@ -92,12 +108,13 @@ case "${SKETCH}" in
         ;;
 esac
 
-docker run -ti                           \
+docker run -ti                             \
        -v "${SKETCH}:/src/firmware/src"    \
        -v "${OUTPUT}:/src/firmware/output" \
        -v "${CFGDIR}:/src/firmware/config" \
+       -v "${LIBDIR}:/src/firmware/lib"    \
        local/kaleidoscope-builder "$@"
 
-rm -rf "${CFGDIR}"
+rm -rf "${CFGDIR}" "${LIBDIR}"
 
 ls -la "${OUTPUT}"/*.hex
