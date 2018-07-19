@@ -38,7 +38,7 @@ RUN git clone https://github.com/keyboardio/Arduino-Boards.git hardware/keyboard
     && make maintainer-update-submodules
 ENV BOARD_HARDWARE_PATH /src/firmware/hardware
 
-VOLUME /src/firmware/src
+VOLUME /src/firmware/sketch
 VOLUME /src/firmware/config
 VOLUME /src/firmware/output
 

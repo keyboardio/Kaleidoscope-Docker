@@ -52,6 +52,7 @@ OPTIONS=""
 PLUGINS=""
 CFGDIR="$(mktemp -d)"
 LIBDIR="$(mktemp -d)"
+SKETCHDIR="$(mktemp -d)"
 STAMP="$(date +%s)"
 
 while getopts ":s:o:O:p:h" o; do
@@ -101,15 +102,20 @@ LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS}"
 EXTRA_BUILDER_ARGS="${KALEIDOSCOPE_EXTRA_BUILDER_ARGS}"
 EOF
 
-case "${SKETCH}" in
-    https://*|http://*|git@*|git://|git+ssh://)
-        git clone -q "${SKETCH}" "${CFGDIR}/sketch"
-        SKETCH="${CFGDIR}/sketch"
-        ;;
-esac
+if ! git clone -q "${SKETCH}" "${SKETCHDIR}"; then
+    rsync -a "${SKETCH}/" "${SKETCHDIR}/"
+    cd "${SKETCHDIR}"
+    if [ ! -d .git ]; then
+        git init --quiet
+        git config user.name Docker
+        git config user.email docker@example.com
+        git commit --quiet --allow-empty -m init
+    fi
+    cd -
+fi
 
 docker run -ti                             \
-       -v "${SKETCH}:/src/firmware/src"    \
+       -v "${SKETCHDIR}:/src/firmware/sketch" \
        -v "${OUTPUT}:/src/firmware/output" \
        -v "${CFGDIR}:/src/firmware/config" \
        -v "${LIBDIR}:/src/firmware/lib"    \
@@ -117,4 +123,4 @@ docker run -ti                             \
 
 rm -rf "${CFGDIR}" "${LIBDIR}"
 
-ls -la "${OUTPUT}/${STAMP}"/*.hex
+echo "Compiled firmware available at ${OUTPUT}/${STAMP}/."
