@@ -43,6 +43,7 @@ case ${BOARD} in
     Model01)
         VID=1209
         PID=2301
+        BOOT_PID=2300
         FLASH=model01
         ;;
     ErgoDox)
@@ -73,8 +74,7 @@ find_device() {
 }
 
 find_firmware() {
-    _dir="$(grep "^Compiled firmware available at" | sed -e 's/^Compiled firmware available at \(.*\)\.$/\1/')"
-    _file="${_dir}*-latest.hex"
+    _file="output/latest/*-latest.hex"
 
     # We *explicitly* want globbing here.
     # shellcheck disable=SC2086
@@ -83,7 +83,19 @@ find_firmware() {
 
 flash_ergodox() {
     HEX="$2"
-    teensy_loader_cli -v --mcu "atmega32u4" -w "${HEX}"
+    output/tools/teensy_loader_cli -v --mcu "atmega32u4" -w "${HEX}"
+}
+
+flash_model01() {
+    DEVICE="$1"
+    HEX="$2"
+
+    echo "When ready, hold down PROG, and press ENTER. Keep holding PROG until flashing starts..."
+    read
+    stty -F ${DEVICE} 1200 hupcl
+    sleep 3s
+    LOADER_PORT=$(find_device "${VID}" "${BOOT_PID}")
+    output/tools/avrdude -q -patmega32u4 -cavr109 -D -P "${LOADER_PORT}" -b57600 "-Uflash:w:${HEX}:i"
 }
 
 device="$(find_device "${VID}" "${PID}")"

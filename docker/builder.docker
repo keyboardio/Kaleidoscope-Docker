@@ -26,7 +26,16 @@
 FROM debian:stable-slim
 
 RUN apt-get update
-RUN apt-get install -y curl git-core make xz-utils
+RUN apt-get install -y curl git-core make xz-utils avrdude libusb-dev build-essential
+
+WORKDIR /usr/src
+RUN git clone https://github.com/PaulStoffregen/teensy_loader_cli.git \
+    && cd teensy_loader_cli \
+    && make \
+    && cp teensy_loader_cli /opt/
+
+RUN apt-get purge -y libusb-dev build-essential \
+    && apt-get autoremove -y
 
 WORKDIR /opt
 RUN curl https://downloads.arduino.cc/arduino-1.8.5-linux64.tar.xz \
