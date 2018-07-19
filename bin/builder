@@ -116,6 +116,8 @@ if ! git clone -q "${SKETCH}" "${SKETCHDIR}" 2>/dev/null; then
         git commit --quiet --allow-empty -m init
     fi
     cd - >/dev/null
+else
+    rsync -a --exclude=.git "${SKETCH}/" "${SKETCHDIR}/"
 fi
 
 docker run -ti                             \
