@@ -1,0 +1,103 @@
+#! /bin/bash
+## Copyright (C) 2018 Gergely Nagy
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are met:
+##
+## 1. Redistributions of source code must retain the above copyright notice,
+## this list of conditions and the following disclaimer.
+##
+## 2. Redistributions in binary form must reproduce the above copyright notice,
+## this list of conditions and the following disclaimer in the documentation
+## and/or other materials provided with the distribution.
+##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+## IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+## ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+## LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+## CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+## SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+## INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+## CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+## POSSIBILITY OF SUCH DAMAGE.
+
+set -e
+
+usage() {
+    cat <<EOF
+Usage: $0 KEYBOARD [PATH]
+EOF
+}
+
+if [ $# -lt 1 ]; then
+    usage >&2
+    exit 1
+fi
+
+BOARD="$1"
+shift
+
+case ${BOARD} in
+    Model01)
+        VID=1209
+        PID=2301
+        FLASH=model01
+        ;;
+    ErgoDox)
+        VID=feed
+        PID=1307
+        FLASH=ergodox
+        ;;
+    *)
+        echo "Unknown board: ${BOARD}!" >&2
+        exit 1
+        ;;
+esac
+
+find_device() {
+    VID=$1
+    PID=$2
+
+    for device in /dev/serial/by-id/*; do
+        _info="$(udevadm info -q property --name="${device}")"
+        _vid="$(echo "$_info" | grep "^ID_VENDOR_ID=" | cut -d= -f2)"
+        _pid="$(echo "$_info" | grep "^ID_MODEL_ID=" | cut -d= -f2)"
+
+        if [ "$_vid" = "$VID" ] && [ "$_pid" = "$PID" ]; then
+            echo "${device}"
+            return
+        fi
+    done
+}
+
+find_firmware() {
+    _dir="$(grep "^Compiled firmware available at" | sed -e 's/^Compiled firmware available at \(.*\)\.$/\1/')"
+    _file="${_dir}*-latest.hex"
+
+    # We *explicitly* want globbing here.
+    # shellcheck disable=SC2086
+    echo ${_file}
+}
+
+flash_ergodox() {
+    HEX="$2"
+    teensy_loader_cli -v --mcu "atmega32u4" -w "${HEX}"
+}
+
+device="$(find_device "${VID}" "${PID}")"
+
+if [ -z "${device}" ]; then
+    echo "No ${BOARD} found. :(" >&2
+    exit 1
+fi
+
+firmware="$(find_firmware)"
+
+if [ -z "${firmware}" ] || ! [ -e "${firmware}" ]; then
+    echo "Can't find the firmware for ${BOARD}." >&2
+    exit 1
+fi
+
+flash_${FLASH} "${device}" "${firmware}"
