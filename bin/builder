@@ -127,7 +127,7 @@ docker run -ti                             \
        -v "${OUTPUT}:/src/firmware/output" \
        -v "${CFGDIR}:/src/firmware/config" \
        -v "${LIBDIR}:/src/firmware/lib"    \
-       local/kaleidoscope-builder "$@"
+       local/kaleidoscope-builder "$@" || true
 
 rm -rf "${WORKDIR}"
 
