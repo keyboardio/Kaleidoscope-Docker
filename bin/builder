@@ -86,6 +86,8 @@ while getopts ":s:o:O:p:h" o; do
 done
 shift $((OPTIND - 1))
 
+install -d "${OUTPUT}"
+
 KALEIDOSCOPE_LOCAL_CFLAGS=""
 for opt in ${OPTIONS}; do
     case $opt in
@@ -122,11 +124,12 @@ elif [ -d "${SKETCH}" ]; then
     rsync -a --exclude=.git "${SKETCH}/" "${SKETCHDIR}/"
 fi
 
-docker run -ti                             \
+docker run -ti                                \
        -v "${SKETCHDIR}:/src/firmware/sketch" \
-       -v "${OUTPUT}:/src/firmware/output" \
-       -v "${CFGDIR}:/src/firmware/config" \
-       -v "${LIBDIR}:/src/firmware/lib"    \
+       -v "${OUTPUT}:/src/firmware/output"    \
+       -v "${CFGDIR}:/src/firmware/config"    \
+       -v "${LIBDIR}:/src/firmware/lib"       \
+       -e OWNER="$(id -u):$(id -g)"           \
        local/kaleidoscope-builder "$@" || true
 
 rm -rf "${WORKDIR}"
