@@ -94,12 +94,10 @@ if [ ! -z "${PLUGINS}" ]; then
     cd "${cwd}"
 fi
 
-if [ ! -z "${KALEIDOSCOPE_LOCAL_CFLAGS}" ]; then
-    cat >>"${CFGDIR}/kaleidoscope-builder.conf" <<EOF
+cat >>"${CFGDIR}/kaleidoscope-builder.conf" <<EOF
 LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS}"
 EXTRA_BUILDER_ARGS="${KALEIDOSCOPE_EXTRA_BUILDER_ARGS}"
 EOF
-fi
 
 case "${SKETCH}" in
     https://*|http://*|git@*|git://|git+ssh://)
