@@ -50,10 +50,15 @@ SKETCH="$(pwd)"
 OUTPUT="$(pwd)/output"
 OPTIONS=""
 PLUGINS=""
-CFGDIR="$(mktemp -d)"
-LIBDIR="$(mktemp -d)"
-SKETCHDIR="$(mktemp -d)"
+
 STAMP="$(date +%s)"
+
+WORKDIR="$(mktemp -d)"
+CFGDIR="${WORKDIR}/config"
+LIBDIR="${WORKDIR}/lib"
+SKETCHDIR="${WORKDIR}/sketch"
+
+install -d "${CFGDIR}" "${LIBDIR}"
 
 while getopts ":s:o:O:p:h" o; do
     case "${o}" in
@@ -121,6 +126,6 @@ docker run -ti                             \
        -v "${LIBDIR}:/src/firmware/lib"    \
        local/kaleidoscope-builder "$@"
 
-rm -rf "${CFGDIR}" "${LIBDIR}"
+rm -rf "${WORKDIR}"
 
 echo "Compiled firmware available at ${OUTPUT}/${STAMP}/."
