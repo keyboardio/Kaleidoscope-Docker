@@ -19,5 +19,3 @@ if [ -e Makefile ]; then
 else
     /src/firmware/hardware/keyboardio/avr/libraries/Kaleidoscope/bin/kaleidoscope-builder $@
 fi
-
-cp output/*/*-latest.* /src/firmware/output

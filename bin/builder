@@ -52,6 +52,7 @@ OPTIONS=""
 PLUGINS=""
 CFGDIR="$(mktemp -d)"
 LIBDIR="$(mktemp -d)"
+STAMP="$(date +%s)"
 
 while getopts ":s:o:O:p:h" o; do
     case "${o}" in
@@ -95,6 +96,7 @@ if [ ! -z "${PLUGINS}" ]; then
 fi
 
 cat >>"${CFGDIR}/kaleidoscope-builder.conf" <<EOF
+OUTPUT_PATH="/src/firmware/output/${STAMP}"
 LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS}"
 EXTRA_BUILDER_ARGS="${KALEIDOSCOPE_EXTRA_BUILDER_ARGS}"
 EOF
@@ -115,4 +117,4 @@ docker run -ti                             \
 
 rm -rf "${CFGDIR}" "${LIBDIR}"
 
-ls -la "${OUTPUT}"/*.hex
+ls -la "${OUTPUT}/${STAMP}"/*.hex
