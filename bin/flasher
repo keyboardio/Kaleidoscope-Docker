@@ -26,9 +26,7 @@
 set -e
 
 usage() {
-    cat <<EOF
-Usage: $0 KEYBOARD [PATH]
-EOF
+    man -l "$(dirname $0)"/flasher.1
 }
 
 if [ $# -lt 1 ]; then

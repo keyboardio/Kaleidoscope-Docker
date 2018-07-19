@@ -26,19 +26,7 @@
 set -e
 
 usage() {
-    cat <<EOF
-Usage: $0 [options] [builder-parameters...]
-
-Options:
-  -s SKETCH_DIR     -- Use SKETCH_DIR as the sketch source. Defaults to '.'.
-  -o OUTPUT_DIR     -- Put build artifacts into OUTPUT_DIR. Defaults to './output'.
-  -O OPTION         -- Additional builder options (see below).
-  -p URL            -- Clone and make available an additional plugin.
-  -h                -- This help screen.
-
-Builder options (-O):
-  plugin-v2         -- Build with the V1 plugin API disabled.
-EOF
+    man -l "$(dirname $0)"/builder.1
 }
 
 docker build --quiet --rm -t local/kaleidoscope-builder -f docker/builder.docker . >/dev/null

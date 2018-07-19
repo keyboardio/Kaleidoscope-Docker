@@ -1,0 +1,76 @@
+.TH "FLASHER" "1" "July 2018" "Keyboardio" "Kaleidoscope-Docker"
+
+.SH "NAME"
+\fbin/builder\fR \- Kaleidoscope firmware builder tool
+
+.SH "SYNOPSIS"
+\fBbin/builder\fR \fIOPTIONS....\fR
+
+.SH "DESCRIPTION"
+\fBbin/builder\fR makes use of a Docker image (which it will also build, if need
+be) with Kaleidoscope and a build environment pre\-set. It builds a given
+\fIsketch\fR with this image, and copies the artifacts to an output directory.
+
+Other than Docker, no other tools or dependencies need to be installed on the
+host system for the compilation to succeed.
+
+.SH "OPTIONS"
+
+.TP
+\fB\-s\fR \fIDIRECTORY/URL\fR
+Set the path to the sketch to compile. Can be either a directory, or an URL to a
+git repository. If it is an URL, it will be cloned first. In either case, the
+original path is not touched in any way.
+
+Defaults to \fI.\fR.
+
+.TP
+\fB\-o\fR \fIDIRECTORY\fR
+Set the output directory, where artifacts will be placed.
+
+Defaults to \fI./output\fR.
+
+.TP
+\fB\-O\fR \fIOPTION\fR
+Toggle any of the options listed below. Can be specified multiple times.
+
+.RS
+
+.TP
+\fIplugin\-v2\fR
+Compile the sketch with the old plugin API disabled, and with only the \fBV2\fR
+API enabled.
+
+.RE
+
+.TP
+\fB\-p\fR \fIPLUGIN_URL\fR
+Make a third\-party plugin available to the sketch. Can be specified multiple
+times. The URL must be a clone\-able git repository.
+
+.TP
+\fB\-h\fR
+Display this manual page, then exit.
+
+.SH "EXAMPLES"
+
+.SS "Building the factory firmware"
+
+.nf
+$ bin/builder \-s https://github.com/keyboardio/Model01\-Firmware.git
+.fi
+
+.SS "Building the factory firmware, with only the new plugin API"
+
+.nf
+$ bin/builder \-s https://github.com/keyboardio/Model01\-Firmware.git \-O plugin\-v2
+.fi
+
+.SS "Building algernon's sketch"
+.nf
+$ bin/builder \-s https://git.madhouse\-project.org/algernon/Model01\-sketch.git \e
+              \-p https://github.com/algernon/Kaleidoscope-LangPack-Hungarian
+.fi
+
+.SH "AUTHOR"
+Gergely Nagy

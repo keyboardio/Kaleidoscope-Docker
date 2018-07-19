@@ -1,0 +1,35 @@
+.TH "FLASHER" "1" "July 2018" "Keyboardio" "Kaleidoscope-Docker"
+
+.SH "NAME"
+\fBbin/flasher\fR \- Kaleidoscope firmware flasher tool
+
+.SH "SYNOPSIS"
+\fBbin/flasher\fR \fIBOARD\fR
+
+.SH "DESCRIPTION"
+\fBbin/flasher\fR is a small tool to aid in flashing a firmware already compiled
+by \fBbin/builder\fR(1). It currently relies on using the default output
+directory of that tool.
+
+The flashing is done using tools shipped with the Docker image, and coped into
+the output directory. They may have shared library dependencies that the host
+needs installed. These would be \fIlibftdi\fR, \fIlibusb\fR, \fIreadline\fR, and
+\fIncurses\fR.
+
+.SH "OPTIONS"
+The only argument the tool accepts is the name of the board, which determines
+how flashing should be done. The following boards are supported:
+
+.TP
+\fBModel01\fR
+The Keyboardio Model01, flashed with \fIavrdude\fR.
+
+.TP
+\fBErgoDox\fR
+The original ErgoDox, or an ErgoDox EZ, or anything else that is wired the same, and uses a Teensy. Flashed with \fIteensy_loader_cli\fR.
+
+.SH "SEE ALSO"
+\fBbin/builder\fR(1)
+
+.SH "AUTHOR"
+Gergely Nagy
