@@ -78,6 +78,8 @@ while getopts ":s:o:O:p:h" o; do
             usage
             exit 0
             ;;
+        *)
+            ;;
     esac
 done
 shift $((OPTIND - 1))
@@ -93,11 +95,10 @@ done
 
 if [ ! -z "${PLUGINS}" ]; then
     KALEIDOSCOPE_EXTRA_BUILDER_ARGS="-libraries /src/firmware/lib"
-    cd "${LIBDIR}"
-    for plugin in ${PLUGINS}; do
-        git clone -q "${plugin}"
-    done
-    cd - >/dev/null
+    (cd "${LIBDIR}" || exit 1;
+     for plugin in ${PLUGINS}; do
+         git clone -q "${plugin}"
+     done)
 fi
 
 cat >>"${CFGDIR}/kaleidoscope-builder.conf" <<EOF
@@ -108,14 +109,13 @@ EOF
 
 if ! git clone -q "${SKETCH}" "${SKETCHDIR}" 2>/dev/null; then
     rsync -a "${SKETCH}/" "${SKETCHDIR}/"
-    cd "${SKETCHDIR}"
+    (cd "${SKETCHDIR}" || exit 1;
     if [ ! -d .git ]; then
         git init --quiet
         git config user.name Docker
         git config user.email docker@example.com
         git commit --quiet --allow-empty -m init
-    fi
-    cd - >/dev/null
+    fi)
 else
     rsync -a --exclude=.git "${SKETCH}/" "${SKETCHDIR}/"
 fi
