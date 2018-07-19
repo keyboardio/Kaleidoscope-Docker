@@ -93,12 +93,11 @@ done
 
 if [ ! -z "${PLUGINS}" ]; then
     KALEIDOSCOPE_EXTRA_BUILDER_ARGS="-libraries /src/firmware/lib"
-    cwd="$(pwd)"
     cd "${LIBDIR}"
     for plugin in ${PLUGINS}; do
         git clone -q "${plugin}"
     done
-    cd "${cwd}"
+    cd - >/dev/null
 fi
 
 cat >>"${CFGDIR}/kaleidoscope-builder.conf" <<EOF
@@ -107,7 +106,7 @@ LOCAL_CFLAGS="${KALEIDOSCOPE_LOCAL_CFLAGS}"
 EXTRA_BUILDER_ARGS="${KALEIDOSCOPE_EXTRA_BUILDER_ARGS}"
 EOF
 
-if ! git clone -q "${SKETCH}" "${SKETCHDIR}"; then
+if ! git clone -q "${SKETCH}" "${SKETCHDIR}" 2>/dev/null; then
     rsync -a "${SKETCH}/" "${SKETCHDIR}/"
     cd "${SKETCHDIR}"
     if [ ! -d .git ]; then
@@ -116,7 +115,7 @@ if ! git clone -q "${SKETCH}" "${SKETCHDIR}"; then
         git config user.email docker@example.com
         git commit --quiet --allow-empty -m init
     fi
-    cd -
+    cd - >/dev/null
 fi
 
 docker run -ti                             \
