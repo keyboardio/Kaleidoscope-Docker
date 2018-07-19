@@ -118,7 +118,7 @@ if ! git clone -q "${SKETCH}" "${SKETCHDIR}" 2>/dev/null; then
         git config user.email docker@example.com
         git commit --quiet --allow-empty -m init
     fi)
-else
+elif [ -d "${SKETCH}" ]; then
     rsync -a --exclude=.git "${SKETCH}/" "${SKETCHDIR}/"
 fi
 
