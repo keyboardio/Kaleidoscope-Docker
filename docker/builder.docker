@@ -34,9 +34,6 @@ RUN git clone https://github.com/PaulStoffregen/teensy_loader_cli.git \
     && make \
     && cp teensy_loader_cli /opt/
 
-RUN apt-get purge -y libusb-dev build-essential \
-    && apt-get autoremove -y
-
 WORKDIR /opt
 RUN curl https://downloads.arduino.cc/arduino-1.8.5-linux64.tar.xz \
     | tar xJf -
@@ -47,6 +44,9 @@ RUN git clone https://github.com/keyboardio/Arduino-Boards.git hardware/keyboard
     && cd hardware/keyboardio/avr \
     && make maintainer-update-submodules
 ENV BOARD_HARDWARE_PATH /src/firmware/hardware
+
+RUN apt-get purge -y libusb-dev build-essential xz-utils curl \
+    && apt-get autoremove -y
 
 VOLUME /src/firmware/sketch
 VOLUME /src/firmware/config
