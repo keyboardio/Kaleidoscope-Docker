@@ -122,6 +122,7 @@ docker run -ti                                \
 
 rm -rf "${WORKDIR}"
 
-ln -sf "${OUTPUT}/${STAMP}" "${OUTPUT}/latest"
+rm -f "${OUTPUT}/latest"
+ln -s "${OUTPUT}/${STAMP}" "${OUTPUT}/latest"
 
 echo "Compiled firmware available at ${OUTPUT}/${STAMP}/."
