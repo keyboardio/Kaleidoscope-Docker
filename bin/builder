@@ -47,10 +47,11 @@ WORKDIR="$(mktemp -d)"
 CFGDIR="${WORKDIR}/config"
 LIBDIR="${WORKDIR}/lib"
 SKETCHDIR="${WORKDIR}/sketch"
+TREEISH="HEAD"
 
 install -d "${CFGDIR}" "${LIBDIR}"
 
-while getopts ":s:o:O:p:h" o; do
+while getopts ":s:o:O:p:t:h" o; do
     case "${o}" in
         s)
             SKETCH="${OPTARG}"
@@ -63,6 +64,9 @@ while getopts ":s:o:O:p:h" o; do
             ;;
         p)
             PLUGINS="${PLUGINS} ${OPTARG}"
+            ;;
+        t)
+            TREEISH="${OPTARG}"
             ;;
         h)
             usage
@@ -108,8 +112,12 @@ if ! git clone -q "${SKETCH}" "${SKETCHDIR}" 2>/dev/null; then
         git config user.email docker@example.com
         git commit --quiet --allow-empty -m init
     fi)
-elif [ -d "${SKETCH}" ]; then
-    rsync -a --exclude=.git "${SKETCH}/" "${SKETCHDIR}/"
+else
+    (cd "${SKETCHDIR}" || exit 1;
+    git checkout --quiet -b docker-build "${TREEISH}")
+    if [ -d "${SKETCH}" ]; then
+        rsync -a --exclude=.git "${SKETCH}/" "${SKETCHDIR}/"
+    fi
 fi
 
 docker run -ti                                \
