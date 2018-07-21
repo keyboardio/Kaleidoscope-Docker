@@ -1,0 +1,10 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker build --rm -t local/kaleidoscope-builder -f docker/builder.docker .
+
+script:
+  - bin/builder -s https://github.com/keyboardio/Model01-Firmware.git -O plugin-v2
