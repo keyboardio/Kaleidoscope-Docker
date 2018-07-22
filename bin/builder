@@ -120,7 +120,7 @@ else
     fi
 fi
 
-docker run -ti                                \
+docker run -ti --rm                           \
        -v "${SKETCHDIR}:/src/firmware/sketch" \
        -v "${OUTPUT}:/src/firmware/output"    \
        -v "${CFGDIR}:/src/firmware/config"    \
