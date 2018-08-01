@@ -29,6 +29,8 @@ usage() {
     man -l "$(dirname $0)"/builder.1
 }
 
+echo "* Preparing the builder image (this may take some time)..."
+
 docker build --quiet --rm -t local/kaleidoscope-builder -f docker/builder.docker . >/dev/null
 
 if [ $# -lt 1 ]; then
@@ -90,6 +92,8 @@ for opt in ${OPTIONS}; do
 done
 
 if [ ! -z "${PLUGINS}" ]; then
+    echo "* Cloning third-party plugins..."
+
     KALEIDOSCOPE_EXTRA_BUILDER_ARGS="-libraries /src/firmware/lib"
     (cd "${LIBDIR}" || exit 1;
      for plugin in ${PLUGINS}; do
@@ -102,6 +106,8 @@ OUTPUT_PATH="/src/firmware/output/${STAMP}"
 LOCAL_CFLAGS="\${LOCAL_CFLAGS} ${KALEIDOSCOPE_LOCAL_CFLAGS}"
 EXTRA_BUILDER_ARGS="${KALEIDOSCOPE_EXTRA_BUILDER_ARGS}"
 EOF
+
+echo "* Preparing the sources..."
 
 if ! git clone -q "${SKETCH}" "${SKETCHDIR}" 2>/dev/null; then
     rsync -a "${SKETCH}/" "${SKETCHDIR}/"
@@ -119,6 +125,8 @@ else
         rsync -a --exclude=.git "${SKETCH}/" "${SKETCHDIR}/"
     fi
 fi
+
+echo "* Building!"
 
 docker run -ti --rm                           \
        -v "${SKETCHDIR}:/src/firmware/sketch" \
