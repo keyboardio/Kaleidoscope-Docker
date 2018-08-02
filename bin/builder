@@ -128,12 +128,12 @@ fi
 
 echo "* Building!"
 
-docker run -ti --rm                           \
-       -v "${SKETCHDIR}:/src/firmware/sketch" \
-       -v "${OUTPUT}:/src/firmware/output"    \
-       -v "${CFGDIR}:/src/firmware/config"    \
-       -v "${LIBDIR}:/src/firmware/lib"       \
-       -e OWNER="$(id -u):$(id -g)"           \
+docker run -ti --rm                             \
+       -v "${SKETCHDIR}:/src/firmware/sketch":Z \
+       -v "${OUTPUT}:/src/firmware/output":Z    \
+       -v "${CFGDIR}:/src/firmware/config":Z    \
+       -v "${LIBDIR}:/src/firmware/lib":Z       \
+       -e OWNER="$(id -u):$(id -g)"             \
        local/kaleidoscope-builder "$@" || true
 
 rm -rf "${WORKDIR}"
