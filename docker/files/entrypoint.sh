@@ -10,6 +10,7 @@ cp /src/firmware/config/kaleidoscope-builder.conf .
 install -d /src/firmware/output/tools
 install /opt/teensy_loader_cli  \
         /opt/arduino-1.8.5/hardware/tools/avr/bin/avrdude \
+        /opt/arduino-1.8.5/hardware/tools/avr/etc/avrdude.conf \
         /src/firmware/output/tools
 
 chown -R "${OWNER}" /src/firmware/output

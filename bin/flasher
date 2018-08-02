@@ -93,7 +93,7 @@ flash_model01() {
     stty -F ${DEVICE} 1200 hupcl
     sleep 3s
     LOADER_PORT=$(find_device "${VID}" "${BOOT_PID}")
-    output/tools/avrdude -q -patmega32u4 -cavr109 -D -P "${LOADER_PORT}" -b57600 "-Uflash:w:${HEX}:i"
+    output/tools/avrdude -C output/tools/avrdude.conf -q -patmega32u4 -cavr109 -D -P "${LOADER_PORT}" -b57600 "-Uflash:w:${HEX}:i"
 }
 
 device="$(find_device "${VID}" "${PID}")"
